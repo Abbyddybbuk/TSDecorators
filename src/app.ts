@@ -34,3 +34,32 @@ class Person {
 
 const pers = new Person(); //Logger will get printed irrespective whether object has been created or not
 console.log(pers);
+
+//////////////////////////////////////////************************////////////////////////////////////////////////////////// */
+function Log(target: any, propertyName: string) {
+    console.log('Property Name Printing...');
+    console.log(target, propertyName);
+}
+
+class Product {
+    @Log
+    title: string;
+    private _price: number;
+
+    constructor(title: string, price: number) {
+        this.title = title;
+        this._price= price;
+    }
+
+    set price(val: number) {
+        if (val > 0) {
+            this._price = val;
+        } else {
+            throw new Error('Value should be greater than 0')
+        }
+    }
+
+    getPriceWithTax(tax: number) {
+        return this._price * (1 + tax);
+    }
+}
