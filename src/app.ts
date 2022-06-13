@@ -12,5 +12,5 @@ class Person {
     }
 }
 
-// const pers = new Person();
+// const pers = new Person(); //Lgger will get printed irrespective whether object has been created or not
 // console.log(pers);
