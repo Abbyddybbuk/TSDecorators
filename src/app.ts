@@ -9,15 +9,21 @@ function Logger(logString: string) {
 
 function WithTemplate(template: string, hookId: string) {
   console.log("WithTemplate Function");
-  return function (constructor: any) {
+  return function <T extends { new (...args: any[]): { name: string } }>(
+    originalConstructor: T
+  ) {
     //   return function (_: Function) {//the _ signals to TS is that yes there is a parameter expected but we do not need it
-    console.log("WithTemplate Decorator");
-    const hookEl = document.getElementById(hookId);
-    const p = new constructor();
-    if (hookEl) {
-      hookEl.innerHTML = template;
-      hookEl.querySelector("h1")!.textContent = p.name;
-    }
+    return class extends originalConstructor {
+      constructor(..._: any[]) {
+        super();
+        console.log("WithTemplate Decorator");
+        const hookEl = document.getElementById(hookId);
+        if (hookEl) {
+          hookEl.innerHTML = template;
+          hookEl.querySelector("h1")!.textContent = this.name;
+        }
+      }
+    };
   };
 }
 
@@ -37,53 +43,56 @@ console.log(pers);
 
 //////////////////////////////////////////************************////////////////////////////////////////////////////////// */
 function Log(target: any, propertyName: string) {
-    console.log('Property Name Printing...');
-    console.log(target, propertyName);
+  console.log("Property Name Printing...");
+  console.log(target, propertyName);
 }
 
 function Log2(target: any, name: string, descriptor: PropertyDescriptor) {
-    console.log('Accessor Decorator...');
-    console.log(target);
-    console.log(name);
-    console.log(descriptor);
+  console.log("Accessor Decorator...");
+  console.log(target);
+  console.log(name);
+  console.log(descriptor);
 }
 
-function Log3(target: any, name: string | Symbol, descriptor: PropertyDescriptor) {
-    console.log('Method Decorator...');
-    console.log(target);
-    console.log(name);
-    console.log(descriptor);
+function Log3(
+  target: any,
+  name: string | Symbol,
+  descriptor: PropertyDescriptor
+) {
+  console.log("Method Decorator...");
+  console.log(target);
+  console.log(name);
+  console.log(descriptor);
 }
 
 function Log4(target: any, name: string | Symbol, position: number) {
-    console.log('Parameter Decorator...');
-    console.log(target);
-    console.log(name);
-    console.log(position);
+  console.log("Parameter Decorator...");
+  console.log(target);
+  console.log(name);
+  console.log(position);
 }
 
-
 class Product {
-    @Log
-    title: string;
-    private _price: number;
+  @Log
+  title: string;
+  private _price: number;
 
-    constructor(title: string, price: number) {
-        this.title = title;
-        this._price= price;
+  constructor(title: string, price: number) {
+    this.title = title;
+    this._price = price;
+  }
+
+  @Log2
+  set price(val: number) {
+    if (val > 0) {
+      this._price = val;
+    } else {
+      throw new Error("Value should be greater than 0");
     }
-    
-    @Log2
-    set price(val: number) {
-        if (val > 0) {
-            this._price = val;
-        } else {
-            throw new Error('Value should be greater than 0')
-        }
-    }
-    
-    @Log3
-    getPriceWithTax(@Log4 tax: number) {
-        return this._price * (1 + tax);
-    }
+  }
+
+  @Log3
+  getPriceWithTax(@Log4 tax: number) {
+    return this._price * (1 + tax);
+  }
 }
